@@ -64,6 +64,11 @@ Public Function getRateBTCUSD() As Double
     getRateBTCUSD = rateDbl
 End Function
 
+'Fonction utilisée dans la feuille SIMULATION. Retourne
+'le cours du BTC en monnaie currencyStr
+'
+'Retourne une valeur négative si la monnaie passée en
+'paramètre est inconnue
 Public Function getRateBTCIn(currencyStr) As Double
     Dim appIE As Object
     Dim dollarCurrency As Double
