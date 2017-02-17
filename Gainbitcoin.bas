@@ -1,7 +1,8 @@
 Attribute VB_Name = "Gainbitcoin"
 Option Explicit
 
-Public Function getRateUSDCHF() As Double
+'Retourne le cours du $ en CHF en créant et libérant un un objet IE
+Public Function getSingleRateUSDCHF() As Double
 '    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim appIE As Object
     Dim allRowOfData As Object
@@ -30,12 +31,14 @@ Public Function getRateUSDCHF() As Double
     rateAskDbl = CDbl(rateAskStr)
     
     appIE.Quit
+    Set allRowOfData = Nothing
     Set appIE = Nothing
     
-    getRateUSDCHF = (rateBidDbl + rateAskDbl) / 2
+    getSingleRateUSDCHF = (rateBidDbl + rateAskDbl) / 2
 End Function
 
-Public Function getRateBTCUSD() As Double
+'Retourne le cours du BTC en $ en créant et libérant un un objet IE
+Public Function getSingleRateBTCUSD() As Double
 '    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim appIE As Object
     Dim element As HTMLTableCell
@@ -59,9 +62,10 @@ Public Function getRateBTCUSD() As Double
     rateDbl = CDbl(rateStr)
     
     appIE.Quit
+    Set element = Nothing
     Set appIE = Nothing
     
-    getRateBTCUSD = rateDbl
+    getSingleRateBTCUSD = rateDbl
 End Function
 
 'Fonction utilisée dans la feuille SIMULATION. Retourne
@@ -80,17 +84,19 @@ Public Function getRateBTCIn(currencyStr) As Double
     
     Select Case currencyStr
         Case "CHF"
-            usdCurrency = getRateUSDCHF2(appIE)
+            usdCurrency = getRateUSDCHF(appIE)
         Case "EUR"
-            usdCurrency = 0 'getRateUSDEUR()
+            usdCurrency = 0
         Case Else
             usdCurrency = -1
     End Select
 
     If usdCurrency < 0 Then
         getRateBTCIn = -1
+    ElseIf usdCurrency = 0 Then
+        getRateBTCIn = getRateBTCEUR(appIE)
     Else
-        btcUsd = getRateBTCUSD2(appIE)
+        btcUsd = getRateBTCUSD(appIE)
         getRateBTCIn = btcUsd * usdCurrency
     End If
     
@@ -98,7 +104,7 @@ Public Function getRateBTCIn(currencyStr) As Double
     Set appIE = Nothing
 End Function
 
-Public Function getRateUSDCHF2(appIE As Object) As Double
+Private Function getRateUSDCHF(ByRef appIE As Object) As Double
 '    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim allRowOfData As Object
     Dim rateBidStr As String
@@ -120,16 +126,16 @@ Public Function getRateUSDCHF2(appIE As Object) As Double
     rateBidDbl = CDbl(rateBidStr)
     rateAskDbl = CDbl(rateAskStr)
     
-    getRateUSDCHF2 = (rateBidDbl + rateAskDbl) / 2
+'    Set allRowOfData = Nothing
+    
+    getRateUSDCHF = (rateBidDbl + rateAskDbl) / 2
 End Function
 
-Public Function getRateBTCUSD2(appIE As Object) As Double
+Private Function getRateBTCUSD(ByRef appIE As Object) As Double
 '    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim element As HTMLTableCell
     Dim rateStr As String
     Dim rateDbl As Double
-    
-    Set appIE = CreateObject("internetexplorer.application")
     
     appIE.Navigate "https://uk.investing.com/currencies/btc-usd"
     
@@ -142,7 +148,36 @@ Public Function getRateBTCUSD2(appIE As Object) As Double
     rateStr = Replace(element.innerText, ",", "")
     rateDbl = CDbl(rateStr)
     
-    getRateBTCUSD2 = rateDbl
+'    Set element = Nothing
+    
+    getRateBTCUSD = rateDbl
+End Function
+
+Private Function getRateBTCEUR(ByRef appIE As Object) As Double
+'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
+    Dim allRowOfData As Object
+    Dim rateBidStr As String
+    Dim rateAskStr As String
+    Dim rateBidDbl As Double
+    Dim rateAskDbl As Double
+    
+    appIE.Navigate "https://uk.investing.com/currencies/streaming-forex-rates-majors"
+    
+    Do While appIE.Busy
+        DoEvents
+    Loop
+    
+    Set allRowOfData = appIE.Document.getElementById("pair_22")
+    
+    rateBidStr = allRowOfData.Cells(2).innerHTML
+    rateAskStr = allRowOfData.Cells(3).innerHTML
+    
+    rateBidDbl = CDbl(rateBidStr)
+    rateAskDbl = CDbl(rateAskStr)
+    
+'    Set allRowOfData = Nothing
+    
+    getRateBTCEUR = (rateBidDbl + rateAskDbl) / 2
 End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
