@@ -82,7 +82,7 @@ Public Function getRateBTCIn(currencyStr) As Double
     
     Select Case currencyStr
         Case "CHF"
-            usdCurrency = getRateUSDCHF(appIE)
+            usdCurrency = getRate(appIE, "pair_4")
         Case "EUR"
             usdCurrency = 0
         Case Else
@@ -94,7 +94,7 @@ Public Function getRateBTCIn(currencyStr) As Double
     ElseIf usdCurrency = 0 Then
         getRateBTCIn = getRate(appIE, "pair_22")
     Else
-        btcUsd = 1 'getRateBTCUSD(appIE)
+        btcUsd = getRate(appIE, "pair_21")
         getRateBTCIn = btcUsd * usdCurrency
     End If
     
