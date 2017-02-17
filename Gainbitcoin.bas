@@ -92,7 +92,7 @@ Public Function getRateBTCIn(currencyStr) As Double
     If usdCurrency < 0 Then
         getRateBTCIn = -1
     ElseIf usdCurrency = 0 Then
-        getRateBTCIn = getRateBTCEUR(appIE)
+        getRateBTCIn = getRate(appIE, "pair_22")
     Else
         btcUsd = getRateBTCUSD(appIE)
         getRateBTCIn = btcUsd * usdCurrency
@@ -149,7 +149,7 @@ Private Function getRateBTCUSD(ByRef appIE As Object) As Double
     getRateBTCUSD = rateDbl
 End Function
 
-Private Function getRateBTCEUR(ByRef appIE As Object) As Double
+Private Function getRate(ByRef appIE As Object, lineTag As String) As Double
     Dim allRowOfData As Object
     Dim rateBidStr As String
     Dim rateAskStr As String
@@ -162,7 +162,7 @@ Private Function getRateBTCEUR(ByRef appIE As Object) As Double
         DoEvents
     Loop
     
-    Set allRowOfData = appIE.Document.getElementById("pair_22")
+    Set allRowOfData = appIE.Document.getElementById(lineTag)
     
     rateBidStr = allRowOfData.Cells(2).innerHTML
     rateAskStr = allRowOfData.Cells(3).innerHTML
@@ -172,7 +172,7 @@ Private Function getRateBTCEUR(ByRef appIE As Object) As Double
     
 '    Set allRowOfData = Nothing
     
-    getRateBTCEUR = (rateBidDbl + rateAskDbl) / 2
+    getRate = (rateBidDbl + rateAskDbl) / 2
 End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
