@@ -3,7 +3,6 @@ Option Explicit
 
 'Retourne le cours du $ en CHF en créant et libérant un un objet IE
 Public Function getSingleRateUSDCHF() As Double
-'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim appIE As Object
     Dim allRowOfData As Object
     Dim rateBidStr As String
@@ -39,7 +38,6 @@ End Function
 
 'Retourne le cours du BTC en $ en créant et libérant un un objet IE
 Public Function getSingleRateBTCUSD() As Double
-'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim appIE As Object
     Dim element As HTMLTableCell
     Dim rateStr As String
@@ -105,7 +103,6 @@ Public Function getRateBTCIn(currencyStr) As Double
 End Function
 
 Private Function getRateUSDCHF(ByRef appIE As Object) As Double
-'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim allRowOfData As Object
     Dim rateBidStr As String
     Dim rateAskStr As String
@@ -132,7 +129,6 @@ Private Function getRateUSDCHF(ByRef appIE As Object) As Double
 End Function
 
 Private Function getRateBTCUSD(ByRef appIE As Object) As Double
-'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim element As HTMLTableCell
     Dim rateStr As String
     Dim rateDbl As Double
@@ -154,7 +150,6 @@ Private Function getRateBTCUSD(ByRef appIE As Object) As Double
 End Function
 
 Private Function getRateBTCEUR(ByRef appIE As Object) As Double
-'    Application.Volatile True 'enforce recalculation if F9 or at sheet opening
     Dim allRowOfData As Object
     Dim rateBidStr As String
     Dim rateAskStr As String
