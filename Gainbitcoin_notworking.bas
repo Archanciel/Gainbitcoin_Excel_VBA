@@ -1,4 +1,4 @@
-Attribute VB_Name = "Gainbitcoin"
+Attribute VB_Name = "Gainbitcoin_notworking"
 Option Explicit
 
 'Retourne le cours du $ en CHF en créant et libérant un un objet IE
@@ -77,12 +77,14 @@ Public Function getRateBTCIn(currencyStr) As Double
     Dim usdCurrency As Double
     Dim btcUsd As Double
     
-    Set appIE = CreateObject("internetexplorer.application")
-    appIE.Visible = False
     
     Select Case currencyStr
         Case "CHF"
-            usdCurrency = getRateUSDCHF(appIE)
+            Set appIE = CreateObject("internetexplorer.application")
+            appIE.Visible = False
+            usdCurrency = getRate(appIE, "pair_4")
+            appIE.Quit
+            Set appIE = Nothing
         Case "EUR"
             usdCurrency = 0
         Case Else
@@ -92,14 +94,20 @@ Public Function getRateBTCIn(currencyStr) As Double
     If usdCurrency < 0 Then
         getRateBTCIn = -1
     ElseIf usdCurrency = 0 Then
+        Set appIE = CreateObject("internetexplorer.application")
+        appIE.Visible = False
         getRateBTCIn = getRate(appIE, "pair_22")
+        appIE.Quit
+        Set appIE = Nothing
     Else
-        btcUsd = 1 'getRateBTCUSD(appIE)
+        Set appIE = CreateObject("internetexplorer.application")
+        appIE.Visible = False
+        btcUsd = getRate(appIE, "pair_21")
         getRateBTCIn = btcUsd * usdCurrency
+        appIE.Quit
+        Set appIE = Nothing
     End If
     
-    appIE.Quit
-    Set appIE = Nothing
 End Function
 
 Private Function getRateUSDCHF(ByRef appIE As Object) As Double
@@ -165,9 +173,7 @@ Private Function getRate(ByRef appIE As Object, lineTag As String) As Double
     Set allRowOfData = appIE.Document.getElementById(lineTag)
     
     rateBidStr = allRowOfData.Cells(2).innerHTML
-    rateBidStr = Replace(rateBidStr, ",", "")
     rateAskStr = allRowOfData.Cells(3).innerHTML
-    rateAskStr = Replace(rateAskStr, ",", "")
     
     rateBidDbl = CDbl(rateBidStr)
     rateAskDbl = CDbl(rateAskStr)
@@ -179,7 +185,7 @@ End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
 Sub updateRealTimeRates()
-Attribute updateRealTimeRates.VB_ProcData.VB_Invoke_Func = "U\n14"
+Attribute updateRealTimeRates.VB_ProcData.VB_Invoke_Func = "u\n14"
     Range("COURS_TMPS_REEL").Replace What:="=", Replacement:="=", LookAt:=xlPart, SearchOrder _
         :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
 End Sub
@@ -193,7 +199,5 @@ Private Sub Auto_Open()
     updateRealTimeRates
     MsgBox "Real time rates update successfull (CTRL + U to refresh)", vbOKOnly + vbInformation
 End Sub
-
-
 
 
