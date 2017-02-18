@@ -102,54 +102,9 @@ Public Function getRateBTCIn(currencyStr) As Double
     Set appIE = Nothing
 End Function
 
-Private Function getRateUSDCHF(ByRef appIE As Object) As Double
-    Dim allRowOfData As Object
-    Dim rateBidStr As String
-    Dim rateAskStr As String
-    Dim rateBidDbl As Double
-    Dim rateAskDbl As Double
-    
-    appIE.Navigate "https://uk.investing.com/currencies/streaming-forex-rates-majors"
-    
-    Do While appIE.Busy
-        DoEvents
-    Loop
-    
-    Set allRowOfData = appIE.Document.getElementById("pair_4")
-    
-    rateBidStr = allRowOfData.Cells(2).innerHTML
-    rateAskStr = allRowOfData.Cells(3).innerHTML
-    
-    rateBidDbl = CDbl(rateBidStr)
-    rateAskDbl = CDbl(rateAskStr)
-    
-'    Set allRowOfData = Nothing
-    
-    getRateUSDCHF = (rateBidDbl + rateAskDbl) / 2
-End Function
-
-Private Function getRateBTCUSD(ByRef appIE As Object) As Double
-    Dim element As HTMLTableCell
-    Dim rateStr As String
-    Dim rateDbl As Double
-    
-    appIE.Navigate "https://uk.investing.com/currencies/btc-usd"
-    
-    Do While appIE.Busy
-        DoEvents
-    Loop
-    
-    Set element = appIE.Document.getElementById("lst_49798")
-    
-    rateStr = Replace(element.innerText, ",", "")
-    rateDbl = CDbl(rateStr)
-    
-'    Set element = Nothing
-    
-    getRateBTCUSD = rateDbl
-End Function
-
 Private Function getRate(ByRef appIE As Object, lineTag As String) As Double
+On Error GoTo errorHandler
+    
     Dim allRowOfData As Object
     Dim rateBidStr As String
     Dim rateAskStr As String
@@ -172,9 +127,15 @@ Private Function getRate(ByRef appIE As Object, lineTag As String) As Double
     rateBidDbl = CDbl(rateBidStr)
     rateAskDbl = CDbl(rateAskStr)
     
-'    Set allRowOfData = Nothing
+    Set allRowOfData = Nothing
     
     getRate = (rateBidDbl + rateAskDbl) / 2
+
+    Exit Function
+    
+errorHandler:
+    'indique le numéro et la description de l'erreur survenue
+    MsgBox Err.Number & vbLf & Err.Description & ". Try CTRL + SHIFT + U to refresh the rate manually."
 End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
@@ -184,14 +145,18 @@ Attribute updateRealTimeRates.VB_ProcData.VB_Invoke_Func = "U\n14"
         :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
 End Sub
 
-Sub tst()
-    Dim tmp As Double
-    tmp = getRateBTCIn("CHF")
-    MsgBox tmp
-End Sub
 Private Sub Auto_Open()
+    Dim appIE As Object
+    
+    '4 next instructions are necessary, otherwise IE is not available when getRate is called,
+    'which causes an error to occur (caught by the error handler) !
+    Set appIE = CreateObject("internetexplorer.application")
+    appIE.Visible = False
+    appIE.Quit
+    Set appIE = Nothing
+    
     updateRealTimeRates
-    MsgBox "Real time rates update successfull (CTRL + U to refresh)", vbOKOnly + vbInformation
+    MsgBox "Real time rates update successfull (CTRL + SHIFT + U to refresh)", vbOKOnly + vbInformation
 End Sub
 
 
