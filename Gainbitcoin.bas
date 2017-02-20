@@ -135,7 +135,7 @@ On Error GoTo errorHandler
     
 errorHandler:
     'indique le numéro et la description de l'erreur survenue
-    MsgBox Err.Number & vbLf & Err.Description & ". Try CTRL + SHIFT + U to refresh the rate manually."
+    MsgBox Err.Number & vbLf & Err.Description & ". Essayer CTRL + SHIFT + U to mettre à jour le cours manuellement."
 End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
@@ -156,7 +156,7 @@ Private Sub Auto_Open()
     Set appIE = Nothing
     
     updateRealTimeRates
-    MsgBox "Real time rates update successfull (CTRL + SHIFT + U to refresh)", vbOKOnly + vbInformation
+    MsgBox "Obtention du cours temp réel du bitcoin réussie (CTRL + SHIFT + U pour mettre à jour)", vbOKOnly + vbInformation
 End Sub
 
 
