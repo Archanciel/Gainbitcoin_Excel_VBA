@@ -139,6 +139,9 @@ errorHandler:
 End Function
 
 'Forcing the realtime quotes functions in the range to refetch their value
+'
+'This macro is assigned to the currency selection combo. So, it is called each time the
+'user selects another currency !
 Sub updateRealTimeRates()
 Attribute updateRealTimeRates.VB_ProcData.VB_Invoke_Func = "U\n14"
     Range("COURS_TMPS_REEL").Replace What:="=", Replacement:="=", LookAt:=xlPart, SearchOrder _
@@ -158,7 +161,5 @@ Private Sub Auto_Open()
     updateRealTimeRates
     MsgBox "Obtention du cours temp réel du bitcoin réussie (CTRL + SHIFT + U pour mettre à jour)", vbOKOnly + vbInformation
 End Sub
-
-
 
 
