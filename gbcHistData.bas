@@ -8,11 +8,19 @@ Attribute AddEntries.VB_ProcData.VB_Invoke_Func = "q\n14"
 ' Touche de raccourci du clavier: Ctrl+q
 '
     Dim startCell As Range
-    Dim currentRow
-    Dim titleRow
+    Dim currentRow As Long
+    Dim titleRow As Long
+    Dim firstEmptyRow As Long
     Application.ScreenUpdating = False
     
-    Set startCell = Selection
+    firstEmptyRow = getLastDataRowInCol(1)
+    
+    If firstEmptyRow > 1 Then
+        firstEmptyRow = firstEmptyRow + 1
+    End If
+    
+    Set startCell = Range("A" & firstEmptyRow)
+    startCell.Select
     currentRow = startCell.Row
     
     'pasting content copied by the Firefox TableTool2 plugin
@@ -27,9 +35,8 @@ Attribute AddEntries.VB_ProcData.VB_Invoke_Func = "q\n14"
         Set startCell = Selection 'as line was deleted, startCell must be reset
     End If
     
-    startCell.Offset(, 2).Activate
-    
     'removing BTC from earning amounts
+    startCell.Offset(, 2).Activate
     Range(Selection, Selection.End(xlDown)).Select
     Selection.NumberFormat = "General"
     Selection.Replace What:=" BTC", Replacement:="", LookAt:=xlPart, _
@@ -81,3 +88,10 @@ Private Sub SplitDateTime(startCell As Range)
     Range(timeCol, timeCol.End(xlDown)).Select
     Selection.NumberFormat = "[$-F400]h:mm:ss AM/PM"
 End Sub
+
+Private Function getLastDataRowInCol(col As Long) As Long
+'Find the last used row in a Column: column A in this example
+    With ActiveSheet
+        getLastDataRowInCol = .Cells(.Rows.Count, col).End(xlUp).Row
+    End With
+End Function
